@@ -1,10 +1,10 @@
 defmodule WrappedError do
-  @behaviour Causer
+  @behaviour Unwrap
 
-  @enforce_keys[:error]
+  @enforce_keys [:error]
   defexception [:message, :env, :error]
 
-  def cause(%WrappedError{error: error}) do
+  def unwrap(%WrappedError{error: error}) do
     error
   end
 end
