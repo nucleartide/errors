@@ -1,18 +1,44 @@
 defmodule Error do
-  @moduledoc """
-  Documentation for Error.
-  """
+  defmacro wrap(error, message \\ "") do
+    quote do
+      WrappedError.exception(
+        error:   unquote(error),
+        env:     __ENV__,
+        message: unquote(message)
+      )
+    end
+  end
 
-  @doc """
-  Hello world.
+  defmacro new(message \\ "") do
+    quote do
+      WrappedError.exception(env: __ENV__, message: unquote(message))
+    end
+  end
 
-  ## Examples
+  def with_message(error, message \\ "") do
+    WrappedError.exception(error: error, message: message, env: nil)
+  end
 
-      iex> Error.hello
-      :world
+  defmacro with_stack(error) do
+    quote do
+      WrappedError.exception(
+        error:   unquote(error),
+        env:     __ENV__,
+        message: nil
+      )
+    end
+  end
 
-  """
-  def hello do
-    :world
+  # x: test this, use Kernel.is_function/1 maybe
+  def cause(error) do
+    atom = error.__struct__
+    atom.cause(error)
+  end
+
+  # TODO: format
+  # TODO: format :verbose, more options
+  # x: string.chars protocol - just messages
+  # TODO: inspect protocol - more detailed
+  def format() do
   end
 end
