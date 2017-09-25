@@ -30,25 +30,6 @@ defmodule Errors do
   end
 
   @doc """
-  Check if a module is an implementation of a behaviour.
-
-  TODO: move this into another module
-
-      iex> WrappedError |> Errors.implements?(Unwrap)
-      true
-
-      iex> WrappedError |> Errors.implements?(Enumerable)
-      false
-
-  """
-  @spec implements?(module :: atom, behaviour :: atom) :: boolean
-  def implements?(module, behaviour) do
-    module.module_info[:attributes]
-    |> Keyword.get(:behaviour, [])
-    |> Enum.member?(behaviour)
-  end
-
-  @doc """
   Unwrap returns the original Exception of an Exception that implements
   the Unwrap behaviour.
 
@@ -58,12 +39,8 @@ defmodule Errors do
       %RuntimeError{message: "something failed"}
 
   """
-  @spec unwrap(error :: Exception.t) :: Exception.t
-  def unwrap(error = %{__struct__: mod}) do
-    if mod |> implements?(Unwrap) do
-      mod.unwrap(error)
-    else
-      raise "#{mod} doesn't implement Unwrap"
-    end
+  @spec unwrap(error :: Unwrap.t) :: Exception.t
+  def unwrap(error) do
+    Unwrap.unwrap(error)
   end
 end

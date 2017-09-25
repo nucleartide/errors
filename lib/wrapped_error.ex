@@ -1,16 +1,11 @@
 defmodule WrappedError do
-  @behaviour Unwrap
-
   @enforce_keys [:error]
   defexception [:message, :env, :error]
-
-  def unwrap(%WrappedError{error: error}) do
-    error
-  end
 end
 
-# defimpl Inspect, for: WrappedError do
-# end
+defimpl Unwrap, for: WrappedError do
+  def unwrap(%WrappedError{error: e}), do: e
+end
 
 defimpl String.Chars, for: WrappedError do
   def to_string(%WrappedError{error: nil, message: msg}),
@@ -22,37 +17,31 @@ defimpl String.Chars, for: WrappedError do
 end
 
 defimpl Inspect, for: WrappedError do
-  # import Inspect.Algebra
-  # message, env, error
-
-  # base case
-  defp inspects(err = %WrappedError{env: env, error: nil, message: msg}) do
-    stacktrace = env
-      |> Macro.Env.stacktrace()
-      |> Exception.format_stacktrace()
-
-    Exception.format_banner(:error, err, Macro.Env.stacktrace(env)) <> "\n" <> stacktrace
-  end
-  defp inspects(err = %WrappedError{env: env, error: new_err = %WrappedError{}, message: msg}) do
-    stacktrace = env
-      |> Macro.Env.stacktrace()
-      |> Exception.format_stacktrace()
-
-    Exception.format_banner(:error, err, Macro.Env.stacktrace(env)) <> "\n" <> stacktrace <> inspects(new_err)
-  end
-  defp inspects(current_err = %WrappedError{env: env, error: err, message: msg}) do
-    stacktrace = env
-      |> Macro.Env.stacktrace()
-      |> Exception.format_stacktrace()
-
-    Exception.format_banner(:error, current_err, Macro.Env.stacktrace(env)) <> "\n" <> stacktrace <> inspects(err)
-  end
-  # base case
-  defp inspects(err) do
-   Exception.format_banner(:error, err, [])
-  end
-
   def inspect(err, _opts) do
-    inspects(err)
+    document(err)
+  end
+
+  # Given a WrappedError, return an Inspect.Algebra document.
+  defp document(w = %WrappedError{env: env, error: nil}) do
+    :error
+    |> Exception.format_banner(w, Macro.Env.stacktrace(env))
+    |> Inspect.Algebra.line(stacktrace(env))
+  end
+  defp document(w = %WrappedError{env: env, error: err}) do
+    :error
+    |> Exception.format_banner(w, Macro.Env.stacktrace(env))
+    |> Inspect.Algebra.line(stacktrace(env))
+    |> Inspect.Algebra.line(document(err))
+  end
+  defp document(err) do
+    Exception.format_banner(:error, err, [])
+  end
+
+  # Format a Macro.Env struct and return the formatting.
+  defp stacktrace(env) do
+    env
+    |> Macro.Env.stacktrace()
+    |> Exception.format_stacktrace()
+    |> String.replace_suffix("\n", "")
   end
 end
