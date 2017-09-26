@@ -55,34 +55,4 @@ defmodule ErrorsTest do
     assert "this is also an error" = e
   end
 
-  test "wrap/2, Inspect.WrappedError.inspect/2" do
-    assert {:ok, pid} = StringIO.open("")
-    err = %RuntimeError{message: "this is an error"}
-      |> Errors.wrap("jesse")
-      |> Errors.wrap("jason")
-    IO.inspect(pid, err, [])
-
-    expected = ~s"""
-** (WrappedError) jason
-\ \ \ \ test/error_test.exs:62: ErrorsTest."test wrap/2, Inspect.WrappedError.inspect/2"/1
-** (WrappedError) jesse
-\ \ \ \ test/error_test.exs:61: ErrorsTest."test wrap/2, Inspect.WrappedError.inspect/2"/1
-** (RuntimeError) this is an error
-    """
-    assert {:ok, {"", actual}} = StringIO.close(pid)
-    assert actual == expected
-  end
-
-  test "new/1, Inspect.WrappedError.inspect/2" do
-    assert {:ok, pid} = StringIO.open("")
-    err = Errors.new("this is an error")
-    IO.inspect(pid, err, [])
-
-    expected = ~s"""
-** (WrappedError) this is an error
-\ \ \ \ test/error_test.exs:78: ErrorsTest."test new/1, Inspect.WrappedError.inspect/2"/1
-    """
-    assert {:ok, {"", actual}} = StringIO.close(pid)
-    assert actual == expected
-  end
 end
