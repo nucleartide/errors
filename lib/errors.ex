@@ -5,7 +5,7 @@ defmodule Errors do
   This macro automatically passes __ENV__ to the WrappedError. Thus, you
   should use this function over %WrappedError{} when possible.
   """
-  @spec wrap(error :: String.t, message :: String.t) :: Macro.t
+  @spec wrap(error :: Exception.t, message :: String.t) :: Macro.t
   defmacro wrap(error, message \\ "") do
     quote do
       WrappedError.exception(
@@ -20,7 +20,7 @@ defmodule Errors do
   Construct a new WrappedError.
 
   Note that the returned WrappedError will have its error field set to
-  nil. If you want to _wrap_ an error, use Errors.wrap/2 instead.
+  nil. If you want to wrap an existing error, use Errors.wrap/2.
   """
   @spec new(message :: String.t) :: Macro.t
   defmacro new(message \\ "") do
@@ -33,14 +33,8 @@ defmodule Errors do
   Cause recursively unfurls a passed-in value that implements Cause.
 
   It will return the first value that does not implement Cause.
-
-      iex> RuntimeError.exception("something failed")
-      ...> |> Errors.wrap()
-      ...> |> Errors.cause()
-      %RuntimeError{message: "something failed"}
-
   """
-  @spec cause(error :: Cause.t) :: Exception.t
+  @spec cause(error :: Cause.t | any) :: Exception.t | any
   def cause(error) do
     try do
       Cause.cause(error)

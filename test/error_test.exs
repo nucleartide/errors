@@ -18,6 +18,15 @@ defmodule ErrorsTest do
     assert m == msg
   end
 
+  test "cause/1" do
+    assert nil == Errors.cause(nil)
+    assert 42 = Errors.cause(42)
+    assert "flank steak" = Errors.cause("flank steak")
+
+    assert nil == Errors.new() |> Errors.cause()
+    assert %RuntimeError{} = %RuntimeError{} |> Errors.wrap() |> Errors.cause()
+  end
+
   test "wrap/2, String.Chars.WrappedError.to_string/1" do
     assert {:ok, pid} = StringIO.open("")
     err = %RuntimeError{message: "this is an error"}
