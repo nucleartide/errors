@@ -10,7 +10,7 @@ defmodule Errors.WrappedErrorTest do
   of stack traces is somewhat brittle.
   """
 
-  test "wrap/2, Inspect.WrappedError.inspect/2" do
+  test "wrap/2, Inspect.Errors.WrappedError.inspect/2" do
     assert {:ok, pid} = StringIO.open("")
     err = %RuntimeError{message: "this is an error"}
       |> Errors.wrap("jesse")
@@ -28,7 +28,7 @@ defmodule Errors.WrappedErrorTest do
     assert actual == expected
   end
 
-  test "new/1, Inspect.WrappedError.inspect/2" do
+  test "new/1, Inspect.Errors.WrappedError.inspect/2" do
     assert {:ok, pid} = StringIO.open("")
     err = Errors.new("this is an error")
     IO.inspect(pid, err, [])
