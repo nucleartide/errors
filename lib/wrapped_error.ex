@@ -3,8 +3,11 @@ defmodule WrappedError do
   defexception [:message, :env, :error]
 end
 
-defimpl Unwrap, for: WrappedError do
-  def unwrap(%WrappedError{error: e}), do: e
+defimpl Cause, for: WrappedError do
+  def cause(%WrappedError{error: e = %WrappedError{}}),
+    do: cause(e)
+  def cause(%WrappedError{error: e}),
+    do: e
 end
 
 defimpl String.Chars, for: WrappedError do

@@ -30,17 +30,22 @@ defmodule Errors do
   end
 
   @doc """
-  Unwrap returns the original Exception of an Exception that implements
-  the Unwrap behaviour.
+  Cause recursively unfurls a passed-in value that implements Cause.
+
+  It will return the first value that does not implement Cause.
 
       iex> RuntimeError.exception("something failed")
       ...> |> Errors.wrap()
-      ...> |> Errors.unwrap()
+      ...> |> Errors.cause()
       %RuntimeError{message: "something failed"}
 
   """
-  @spec unwrap(error :: Unwrap.t) :: Exception.t
-  def unwrap(error) do
-    Unwrap.unwrap(error)
+  @spec cause(error :: Cause.t) :: Exception.t
+  def cause(error) do
+    try do
+      Cause.cause(error)
+    rescue
+      Protocol.UndefinedError -> error
+    end
   end
 end
