@@ -1,6 +1,6 @@
-defmodule WrappedErrorTest do
+defmodule Errors.WrappedErrorTest do
   use ExUnit.Case
-  doctest WrappedError
+  doctest Errors.WrappedError
   require Errors
 
   @moduledoc """
@@ -18,10 +18,10 @@ defmodule WrappedErrorTest do
     IO.inspect(pid, err, [])
 
     expected = ~s"""
-** (WrappedError) jason
-\ \ \ \ test/wrapped_error_test.exs:17: WrappedErrorTest."test wrap/2, Inspect.WrappedError.inspect/2"/1
-** (WrappedError) jesse
-\ \ \ \ test/wrapped_error_test.exs:16: WrappedErrorTest."test wrap/2, Inspect.WrappedError.inspect/2"/1
+** (Errors.WrappedError) jason
+\ \ \ \ errors/wrapped_error_test.exs:17: Errors.WrappedErrorTest."test wrap/2, Inspect.WrappedError.inspect/2"/1
+** (Errors.WrappedError) jesse
+\ \ \ \ errors/wrapped_error_test.exs:16: Errors.WrappedErrorTest."test wrap/2, Inspect.WrappedError.inspect/2"/1
 ** (RuntimeError) this is an error
     """
     assert {:ok, {"", actual}} = StringIO.close(pid)
@@ -34,8 +34,8 @@ defmodule WrappedErrorTest do
     IO.inspect(pid, err, [])
 
     expected = ~s"""
-** (WrappedError) this is an error
-\ \ \ \ test/wrapped_error_test.exs:33: WrappedErrorTest."test new/1, Inspect.WrappedError.inspect/2"/1
+** (Errors.WrappedError) this is an error
+\ \ \ \ errors/wrapped_error_test.exs:33: Errors.WrappedErrorTest."test new/1, Inspect.WrappedError.inspect/2"/1
     """
     assert {:ok, {"", actual}} = StringIO.close(pid)
     assert actual == expected

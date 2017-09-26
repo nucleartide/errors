@@ -8,7 +8,7 @@ defmodule Errors do
   @spec wrap(error :: Exception.t, message :: String.t) :: Macro.t
   defmacro wrap(error, message \\ "") do
     quote do
-      WrappedError.exception(
+      Errors.WrappedError.exception(
         error:   unquote(error),
         env:     __ENV__,
         message: unquote(message)
@@ -25,7 +25,7 @@ defmodule Errors do
   @spec new(message :: String.t) :: Macro.t
   defmacro new(message \\ "") do
     quote do
-      WrappedError.exception(env: __ENV__, message: unquote(message))
+      Errors.WrappedError.exception(env: __ENV__, message: unquote(message))
     end
   end
 
@@ -34,10 +34,10 @@ defmodule Errors do
 
   It will return the first value that does not implement Cause.
   """
-  @spec cause(error :: Cause.t | any) :: Exception.t | any
+  @spec cause(error :: Errors.Cause.t | any) :: Exception.t | any
   def cause(error) do
     try do
-      Cause.cause(error)
+      Errors.Cause.cause(error)
     rescue
       Protocol.UndefinedError -> error
     end

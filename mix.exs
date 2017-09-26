@@ -7,7 +7,11 @@ defmodule Error.Mixfile do
       version: "0.1.0",
       elixir: "~> 1.5",
       start_permanent: Mix.env == :prod,
-      deps: deps()
+      deps: deps(),
+      test_paths: ["."],
+      elixirc_paths: File.ls!()
+        |> Enum.filter(fn path -> File.dir?(path) end)
+        |> Enum.filter(fn path -> not Enum.member?([".git", "_build", "deps"], path) end),
     ]
   end
 

@@ -6,7 +6,7 @@ defmodule ErrorsTest do
     err = %RuntimeError{}
     msg = "this is an error"
 
-    assert %WrappedError{error: e, message: m} = Errors.wrap(err, msg)
+    assert %Errors.WrappedError{error: e, message: m} = Errors.wrap(err, msg)
     assert e == err
     assert m == msg
   end
@@ -14,7 +14,7 @@ defmodule ErrorsTest do
   test "new/1" do
     msg = "is it dinner time yet"
 
-    assert %WrappedError{message: m} = Errors.new(msg)
+    assert %Errors.WrappedError{message: m} = Errors.new(msg)
     assert m == msg
   end
 
@@ -54,5 +54,4 @@ defmodule ErrorsTest do
     assert {:ok, {"", e}} = StringIO.close(pid)
     assert "this is also an error" = e
   end
-
 end
