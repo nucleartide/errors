@@ -7,26 +7,19 @@ Errors is an Elixir package that adds context to `reason`s in the `{:ok, result}
 To illustrate why this might be useful, consider the following code snippet:
 
 ```elixir
-# http.ex
 defmodule HTTP do
-  @spec get(url :: String.t) :: {:ok, HTTPoison.Response.t} | {:error, Exception.t}
   def get(url) do
     HTTPoison.get(url)
   end
 end
 
-# github.ex
 defmodule GitHub do
-  @type github_file :: {user :: String.t, repo :: String.t, file :: String.t}
-  @spec file(github_file) :: {:ok, String.t} | {:error, Exception.t}
   def file({user, repo, file}) do
     HTTP.get("https://raw.githubusercontent.com/#{user}/#{repo}/master/#{file}")
   end
 end
 
-# file.ex
 defmodule Repo do
-  @spec read(path :: String.t) :: {:ok, String.t} | {:error, Exception.t}
   def read(path) do
     GitHub.file({"nucleartide", "errors", path})
   end
@@ -45,9 +38,7 @@ This error is even more opaque if `Repo.read/1` comes from a third-party library
 Errors clarifies error reasons by annotating reasons with a message and stack trace. Here's how you would refactor the code above to provide additional debugging context:
 
 ```elixir
-# http.ex
 defmodule HTTP do
-  @spec get(url :: String.t) :: {:ok, HTTPoison.Response.t} | {:error, Exception.t}
   def get(url) do
     with {:ok, res} <- HTTPoison.get(url) do
       res
@@ -57,23 +48,18 @@ defmodule HTTP do
   end
 end
 
-# github.ex
 defmodule GitHub do
-  @type github_file :: {user :: String.t, repo :: String.t, file :: String.t}
-  @spec file(github_file) :: {:ok, String.t} | {:error, Exception.t}
   def file({user, repo, file}) do
     url = "https://raw.githubusercontent.com/#{user}/#{repo}/master/#{file}"
     with {:ok, res} <- HTTP.get(url) do
       res
     else
-      err -> {:error, Errors.wrap(err, "couldn't fetch #{url}")}
+      err -> {:error, Errors.wrap(err, "couldn't fetch github file")}
     end
   end
 end
 
-# file.ex
 defmodule Repo do
-  @spec read(path :: String.t) :: {:ok, String.t} | {:error, Exception.t}
   def read(path) do
     with {:ok, res} <- GitHub.file({"nucleartide", "errors", path}) do
       res
@@ -83,8 +69,28 @@ defmodule Repo do
   end
 end
 
-# iex> Repo.read("notafile.txt")
+# iex> {:error, err} = Repo.read("notafile.txt")
 # ...> {:error, %Errors.WrappedError{...}}
+```
+
+We can print this new `Errors.WrappedError` to understand exactly what went wrong:
+
+```
+iex> IO.puts(err)
+couldn't read from notafile.txt: couldn't fetch github file: http request failed: closed
+```
+
+Or inspect the error for a stack trace:
+
+```
+iex> IO.inspect(err)
+** (Errors.WrappedError) jason
+    example.exs:27: HTTP.get/1
+** (Errors.WrappedError) jesse
+    example.exs:17: GitHub.file/1
+** (Errors.WrappedError) jesse
+    example.exs:6: Repo.read/1
+** (HTTPoison.Error) closed
 ```
 
 ## Install
@@ -104,8 +110,16 @@ Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_do
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at [https://hexdocs.pm/errors](https://hexdocs.pm/errors).
 
+## API
+
+TODO
+
 ## Feedback, issues, concerns
 
-Please open an [issue]().
+Please open an [issue](https://github.com/nucleartide/errors/issues/new).
 
 ---
+
+```
+links and stuff go here
+```
