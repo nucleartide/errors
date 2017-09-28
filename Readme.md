@@ -33,17 +33,17 @@ Here, we see that the `Repo.read/1` operation failed, but the error reason isn't
 
 This error is even more opaque if `Repo.read/1` comes from a third-party library.
 
-#### Solution
+### Solution
 
 Errors clarifies error reasons by annotating reasons with a message and stack trace. Here's how you would refactor the code above to provide additional debugging context:
 
 ```elixir
 defmodule HTTP do
   def get(url) do
-    with {:ok, res} <- HTTPoison.get(url) do
+    with res = {:ok, _} <- HTTPoison.get(url) do
       res
     else
-      err -> {:error, Errors.wrap(err, "http request failed")}
+      {:error, e} -> {:error, Errors.wrap(e, "http request failed")}
     end
   end
 end
@@ -54,20 +54,20 @@ defmodule GitHub do
   end
 
   def file(github_file) do
-    with {:ok, res} <- HTTP.get(github_file |> url()) do
+    with res = {:ok, _} <- HTTP.get(github_file |> url()) do
       res
     else
-      err -> {:error, Errors.wrap(err, "couldn't fetch github file")}
+      {:error, e} -> {:error, Errors.wrap(e, "couldn't fetch github file")}
     end
   end
 end
 
 defmodule Repo do
   def read(path) do
-    with {:ok, res} <- GitHub.file({"nucleartide", "errors", path}) do
+    with res = {:ok, _} <- GitHub.file({"nucleartide", "errors", path}) do
       res
     else
-      err -> {:error, Errors.wrap(err, "couldn't read from #{path}")}
+      {:error, e} -> {:error, Errors.wrap(e, "couldn't read from #{path}")}
     end
   end
 end
@@ -110,11 +110,87 @@ end
 
 ## API
 
-TODO: hexdocs
+Errors exposes three primary macros/functions:
+
+### `Errors.wrap/2`
+
+```elixir
+@spec wrap(error :: Exception.t, message :: String.t) :: Macro.t
+defmacro wrap(error, message \\ "")
+```
+
+Use `Errors.wrap/2` to "wrap" tagged errors received from other functions:
+
+```elixir
+defmodule YourModule do
+  require Errors
+
+  def get() do
+    with res = {:ok, _} <- HTTPoison.get("https://www.google.com/") do
+      res
+    else
+      {:error, e} -> {:error, Errors.wrap(e, "can't ping google")}
+    end
+  end
+end
+```
+
+### `Errors.new/1`
+
+```elixir
+@spec new(message :: String.t) :: Macro.t
+defmacro new(message \\ "")
+```
+
+Use `Errors.new/1` as a general replacement for custom Exception structs:
+
+```elixir
+defmodule YourModule do
+  require Errors
+
+  def transform("https://" <> rest_of_link),
+    do: {:ok, rest_of_link}
+  def transform(_),
+    do: {:error, Errors.new("missing https:// prefix")}
+end
+```
+
+### `Errors.cause/1`
+
+```elixir
+@spec cause(error :: Errors.Cause.t | any) :: Exception.t | any
+def cause(error)
+```
+
+`Errors.cause/1` returns the unwrapped "cause" of an error.
+
+The passed-in `error` should implement the `Errors.Cause` protocol; errors returned by `Errors.wrap/2` and `Errors.new/1` implement `Errors.Cause` already:
+
+```elixir
+require Errors
+
+%RuntimeError{message: "this is an error"}
+|> Errors.wrap("uh-oh")
+|> Errors.cause() # => %RuntimeError{message: "this is an error"}
+```
+
+### `WrappedError`
+
+`Errors.wrap/2` and `Errors.new/1` return a `WrappedError`. `WrappedError` implements the String.Chars and Inspect protocols, so you can freely print and inspect:
+
+```elixir
+e = %RuntimeError{} |> Errors.wrap("uh-oh")
+IO.puts(e)    # will print "uh-oh: runtime error"
+IO.inspect(e) # will print a stack trace
+```
+
+### Hexdocs
+
+See the [hexdocs](https://hexdocs.pm/errors) for more details and links to source code.
 
 ## Feedback, issues, concerns
 
-Please open an [issue](https://github.com/nucleartide/errors/issues/new).
+Please open an [issue](https://github.com/nucleartide/errors/issues/new)!
 
 ---
 
