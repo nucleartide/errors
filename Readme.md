@@ -33,7 +33,7 @@ Here, we see that the `Repo.read/1` operation failed, but the error reason isn't
 
 This error is even more opaque if `Repo.read/1` comes from a third-party library.
 
-### Solution
+#### Solution
 
 Errors clarifies error reasons by annotating reasons with a message and stack trace. Here's how you would refactor the code above to provide additional debugging context:
 
@@ -112,7 +112,7 @@ end
 
 Errors exposes three primary macros/functions:
 
-### `Errors.wrap/2`
+#### `Errors.wrap/2`
 
 ```elixir
 @spec wrap(error :: Exception.t, message :: String.t) :: Macro.t
@@ -135,7 +135,7 @@ defmodule YourModule do
 end
 ```
 
-### `Errors.new/1`
+#### `Errors.new/1`
 
 ```elixir
 @spec new(message :: String.t) :: Macro.t
@@ -155,7 +155,7 @@ defmodule YourModule do
 end
 ```
 
-### `Errors.cause/1`
+#### `Errors.cause/1`
 
 ```elixir
 @spec cause(error :: Errors.Cause.t | any) :: Exception.t | any
@@ -174,7 +174,7 @@ require Errors
 |> Errors.cause() # => %RuntimeError{message: "this is an error"}
 ```
 
-### `WrappedError`
+#### `WrappedError`
 
 `Errors.wrap/2` and `Errors.new/1` return a `WrappedError`. `WrappedError` implements the String.Chars and Inspect protocols, so you can freely print and inspect:
 
@@ -184,7 +184,7 @@ IO.puts(e)    # will print "uh-oh: runtime error"
 IO.inspect(e) # will print a stack trace
 ```
 
-### Hexdocs
+#### Hexdocs
 
 See the [hexdocs](https://hexdocs.pm/errors) for more details and links to source code.
 
