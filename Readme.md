@@ -1,10 +1,10 @@
 ![Errors](https://user-images.githubusercontent.com/914228/30893941-d0a39f10-a30e-11e7-9539-d37ffdc56922.png)
 
-Errors is an Elixir package that adds context to `reason`s in the `{:ok, result} | {:error, reason}` style of error handling.
+Errors is an Elixir package that adds debugging context to error reasons. It is meant to be used in the tagged tuple style of error handling, where a function may return `{:ok, result}` or `{:error, reason}`.
 
-#### Motivation
+## Motivation
 
-To illustrate why this might be useful, consider the following code snippet:
+To illustrate why this might be useful, consider the following code snippet that fetches the contents of a file from a GitHub repo:
 
 ```elixir
 defmodule HTTP do
@@ -29,7 +29,7 @@ end
 # ...> {:error, %HTTPoison.Error{id: nil, reason: :closed}}
 ```
 
-Here, we know that the `Repo.read/1` operation failed, but the error reason isn't particularly helpful. Where is this `HTTPoison.Error` coming from? What was `:closed`?
+Here, we see that the `Repo.read/1` operation failed, but the error reason isn't particularly helpful. Where does the `HTTPoison.Error` come from? What was `:closed`?
 
 This error is even more opaque if `Repo.read/1` comes from a third-party library.
 
@@ -49,9 +49,12 @@ defmodule HTTP do
 end
 
 defmodule GitHub do
-  def file({user, repo, file}) do
-    url = "https://raw.githubusercontent.com/#{user}/#{repo}/master/#{file}"
-    with {:ok, res} <- HTTP.get(url) do
+  defp url({user, repo, file}) do
+    "https://raw.githubusercontent.com/#{user}/#{repo}/master/#{file}"
+  end
+
+  def file(github_file) do
+    with {:ok, res} <- HTTP.get(github_file |> url()) do
       res
     else
       err -> {:error, Errors.wrap(err, "couldn't fetch github file")}
@@ -73,7 +76,7 @@ end
 # ...> {:error, %Errors.WrappedError{...}}
 ```
 
-We can print this new `Errors.WrappedError` to understand exactly what went wrong:
+We can print this new `Errors.WrappedError` to retrieve our annotated messages:
 
 ```
 iex> IO.puts(err)
@@ -84,11 +87,11 @@ Or inspect the error for a stack trace:
 
 ```
 iex> IO.inspect(err)
-** (Errors.WrappedError) jason
+** (Errors.WrappedError) couldn't read from notafile.txt
     example.exs:27: HTTP.get/1
-** (Errors.WrappedError) jesse
+** (Errors.WrappedError) couldn't fetch github file
     example.exs:17: GitHub.file/1
-** (Errors.WrappedError) jesse
+** (Errors.WrappedError) http request failed
     example.exs:6: Repo.read/1
 ** (HTTPoison.Error) closed
 ```
