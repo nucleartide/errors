@@ -98,8 +98,7 @@ iex> IO.inspect(err)
 
 ## Install
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `errors` to your list of dependencies in `mix.exs`:
+Add `:errors` to your `deps` in `mix.exs`:
 
 ```elixir
 def deps do
@@ -109,13 +108,9 @@ def deps do
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/errors](https://hexdocs.pm/errors).
-
 ## API
 
-TODO
+TODO: hexdocs
 
 ## Feedback, issues, concerns
 
@@ -123,6 +118,6 @@ Please open an [issue](https://github.com/nucleartide/errors/issues/new).
 
 ---
 
-```
-links and stuff go here
-```
+> ![](https://cloud.githubusercontent.com/assets/914228/25078295/869950f2-22ff-11e7-8c78-6b5397a8ac72.png)
+>
+> Jason Tu · [@nucleartide](https://twitter.com/nucleartide)
