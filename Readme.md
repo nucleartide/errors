@@ -192,8 +192,12 @@ See the [hexdocs](https://hexdocs.pm/errors) for more details and links to sourc
 
 Please open an [issue](https://github.com/nucleartide/errors/issues/new)!
 
+## Links
+
+- [Introduction blog post](https://medium.com/@nucleartide/graceful-error-handling-in-elixir-c611106e140c)
+
 ---
 
 > ![](https://cloud.githubusercontent.com/assets/914228/25078295/869950f2-22ff-11e7-8c78-6b5397a8ac72.png)
 >
-> Jason Tu · [@nucleartide](https://twitter.com/nucleartide)
+> Jason Tu · GitHub [@nucleartide](https://github.com/nucleartide · Twitter [@nucleartide](https://twitter.com/nucleartide)
