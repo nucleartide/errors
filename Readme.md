@@ -198,6 +198,6 @@ Please open an [issue](https://github.com/nucleartide/errors/issues/new)!
 
 ---
 
-> ![](https://cloud.githubusercontent.com/assets/914228/25078295/869950f2-22ff-11e7-8c78-6b5397a8ac72.png)
+> ![](https://user-images.githubusercontent.com/914228/31273435-a522e1d4-aa5c-11e7-8a09-7186c97da5ec.png)
 >
 > Jason Tu · GitHub [@nucleartide](https://github.com/nucleartide) · Twitter [@nucleartide](https://twitter.com/nucleartide)
